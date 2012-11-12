@@ -1,9 +1,6 @@
-var frequency = 60000; // 60 seconds
 var weather_link = '';
 var temperature;
 var code;
-var image = document.getElementById('image');
-var canvas = document.getElementById('canvas');
 
 
 function getWeather() {
@@ -30,19 +27,28 @@ function getWeatherForLocation(location) {
 
 function showWeather() {
     var channelNode = this.responseXML.getElementsByTagName("channel")[0];
-    var linkNode = channelNode.getElementsByTagName("link")[0];
-    weather_link = linkNode.childNodes[0].nodeValue;
+
+    // get link and ttl
+    weather_link = channelNode.getElementsByTagName("link")[0].childNodes[0].nodeValue;
+    ttl = channelNode.getElementsByTagName("ttl")[0].childNodes[0].nodeValue;
+
+    // get temperature and code
     var itemNode = channelNode.getElementsByTagName("item")[0];
     var conditionNode = itemNode.getElementsByTagNameNS("*", "condition")[0];
     var newTemperature = conditionNode.attributes.getNamedItem("temp").nodeValue;
     var newCode = conditionNode.attributes.getNamedItem("code").nodeValue;
 
+    // update temperature if necessary
     if (temperature != newTemperature) {
         chrome.browserAction.setBadgeText({text: newTemperature + "\u00B0C"});
         temperature = newTemperature;
     }
 
+    // update image if necessary
     if (code != newCode) {
+        var image = document.getElementById('image');
+        var canvas = document.getElementById('canvas');
+
         image.onload = function() {
             var context = canvas.getContext('2d');
             context.fillStyle = "white";
@@ -53,14 +59,16 @@ function showWeather() {
             chrome.browserAction.setIcon({imageData: imageData});
         };
         code = newCode;
+        image.src = 'http://l.yimg.com/a/i/us/we/52/' + code + '.gif';
     }
-    image.src = 'http://l.yimg.com/a/i/us/we/52/' + code + '.gif';
+
+    // reload weather after cache is expired
+    window.setTimeout(getWeather, parseInt(ttl) * 1000);
 }
 
 
 function onInit() {
     getWeather();
-    setInterval(getWeather, frequency);
 }
 
 
