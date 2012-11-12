@@ -1,0 +1,17 @@
+{
+  "name": "Weather",
+  "version": "1.0",
+  "manifest_version": 2,
+  "description": "Shows current weather in current location.",
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "permissions": [
+    "http://weather.yahooapis.com/",
+    "http://l.yimg.com/"
+  ],
+  "background": {
+    "persistent": false,
+    "page": "background.html"
+  }
+}
