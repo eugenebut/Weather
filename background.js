@@ -1,6 +1,5 @@
 var frequency = 60000; // 60 seconds
-var request;
-var link = '';
+var weather_link = '';
 var temperature;
 var code;
 var image = document.getElementById('image');
@@ -8,17 +7,31 @@ var canvas = document.getElementById('canvas');
 
 
 function getWeather() {
-    request = new XMLHttpRequest();
-    request.open('GET', 'http://weather.yahooapis.com/forecastrss?w=2502265&u=c');
-    request.onload = showWeather;
-    request.send()
+    options = {'enableHighAccuracy': true, 'timeout': 10000, 'maximumAge': 0}
+    navigator.geolocation.getCurrentPosition(getWeatherForLocation, null, options);
+}
+
+
+function getWeatherForLocation(location) {
+    var location_request = new XMLHttpRequest();
+    location_request.open('GET', 'http://where.yahooapis.com/geocode?location=' + location.coords.latitude + ','  + location.coords.longitude + '&gflags=R&appid=zHgnBS4m');
+    location_request.onload = function() {
+
+        var woeId = this.responseXML.getElementsByTagName("woeid")[0].childNodes[0].nodeValue;
+
+        var weather_request = new XMLHttpRequest();
+        weather_request.open('GET', 'http://weather.yahooapis.com/forecastrss?u=c&w=' + woeId);
+        weather_request.onload = showWeather;
+        weather_request.send()
+    }
+    location_request.send()
 }
 
 
 function showWeather() {
-    var channelNode = request.responseXML.getElementsByTagName("channel")[0];
+    var channelNode = this.responseXML.getElementsByTagName("channel")[0];
     var linkNode = channelNode.getElementsByTagName("link")[0];
-    link = linkNode.childNodes[0].nodeValue;
+    weather_link = linkNode.childNodes[0].nodeValue;
     var itemNode = channelNode.getElementsByTagName("item")[0];
     var conditionNode = itemNode.getElementsByTagNameNS("*", "condition")[0];
     var newTemperature = conditionNode.attributes.getNamedItem("temp").nodeValue;
@@ -52,7 +65,7 @@ function onInit() {
 
 
 function onClick() {
-    chrome.tabs.create({'url': link}, null)
+    chrome.tabs.create({'url': weather_link}, null)
 }
 
 

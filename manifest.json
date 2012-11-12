@@ -2,13 +2,14 @@
   "name": "Weather",
   "version": "1.0",
   "manifest_version": 2,
-  "description": "Shows current weather in current location.",
+  "description": "Shows weather in current location. Powered by Yahoo! Weather.",
   "browser_action": {
     "default_icon": "icon.png"
   },
   "permissions": [
     "http://weather.yahooapis.com/",
-    "http://l.yimg.com/"
+    "http://l.yimg.com/",
+    "geolocation"
   ],
   "background": {
     "persistent": false,
