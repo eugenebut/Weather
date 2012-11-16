@@ -51,15 +51,19 @@ function showWeather() {
 
         image.onload = function() {
             var context = canvas.getContext('2d');
-            context.fillStyle = "white";
-            context.fillRect(0,0,canvas.width, canvas.height);
-            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+//            context.fillStyle = "white";
+//            context.fillRect(0,0,canvas.width, canvas.height);
+//            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+            context.drawImage(image, 0, 0, 27, 19);
 
             var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
             chrome.browserAction.setIcon({imageData: imageData});
         };
         code = newCode;
-        image.src = 'http://l.yimg.com/a/i/us/we/52/' + code + '.gif';
+//        image.src = 'http://l.yimg.com/a/i/us/we/52/' + code + '.gif';
+
+        image.src = 'http://l.yimg.com/a/i/us/nws/weather/gr/' + code + 'd.png';
     }
 
     // reload weather after cache is expired
