@@ -17,7 +17,7 @@ function getWeatherForLocation(location) {
         var woeId = this.responseXML.getElementsByTagName("woeid")[0].childNodes[0].nodeValue;
 
         var weather_request = new XMLHttpRequest();
-        weather_request.open('GET', 'http://weather.yahooapis.com/forecastrss?u=c&w=' + woeId);
+        weather_request.open('GET', 'http://weather.yahooapis.com/forecastrss?u=' + localStorage['degrees'] + '&w=' + woeId);
         weather_request.onload = showWeather;
         weather_request.send()
     }
@@ -29,7 +29,10 @@ function showWeather() {
     var channelNode = this.responseXML.getElementsByTagName("channel")[0];
 
     // get link and ttl
-    weather_link = channelNode.getElementsByTagName("link")[0].childNodes[0].nodeValue;
+    new_weather_link = channelNode.getElementsByTagName("link")[0].childNodes[0].nodeValue;
+    if ("" != new_weather_link) {
+        weather_link = new_weather_link
+    }
     ttl = channelNode.getElementsByTagName("ttl")[0].childNodes[0].nodeValue;
 
     // get temperature and code
@@ -40,7 +43,7 @@ function showWeather() {
 
     // update temperature if necessary
     if (temperature != newTemperature) {
-        chrome.browserAction.setBadgeText({text: newTemperature + "\u00B0C"});
+        chrome.browserAction.setBadgeText({text: newTemperature + "\u00B0" + localStorage['degrees'].toUpperCase()});
         temperature = newTemperature;
     }
 
@@ -71,7 +74,16 @@ function showWeather() {
 }
 
 
+function updateDefaults() {
+  var degrees = localStorage['degrees'];
+  if (!degrees || degrees != 'f' || degrees != 'c') {
+    localStorage['degrees'] = 'f';
+  }
+}
+
+
 function onInit() {
+    updateDefaults();
     getWeather();
 }
 
