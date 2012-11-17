@@ -13,6 +13,8 @@ function restore_options() {
 
 function set_degrees(sender) {
     localStorage["degrees"] = sender.target.value;
+
+    chrome.extension.sendMessage({action: "reloadWeather"});
 }
 
 

@@ -1,7 +1,7 @@
 var weather_link = '';
 var temperature;
 var code;
-
+var timeout;
 
 function getWeather() {
     options = {'enableHighAccuracy': true, 'timeout': 10000, 'maximumAge': 0}
@@ -70,7 +70,7 @@ function showWeather() {
     }
 
     // reload weather after cache is expired
-    window.setTimeout(getWeather, parseInt(ttl) * 1000);
+    timeout = window.setTimeout(getWeather, parseInt(ttl) * 1000);
 }
 
 
@@ -93,5 +93,15 @@ function onClick() {
 }
 
 
+function onMessage(request, sender, sendResponse) {
+    if (request.action == "reloadWeather") {
+        clearTimeout(timeout);
+        temperature = '';
+        getWeather();
+    }
+}
+
+
 chrome.runtime.onInstalled.addListener(onInit);
 chrome.browserAction.onClicked.addListener(onClick);
+chrome.extension.onMessage.addListener(onMessage);
