@@ -1,39 +1,53 @@
-var weather_link = '';
+var weatherLink = "";
 var temperature;
 var code;
 var timeout;
 
 function getWeather() {
-    options = {'enableHighAccuracy': true, 'timeout': 10000, 'maximumAge': 0}
+    var options = {"enableHighAccuracy": true, "timeout": 10000, "maximumAge": 0}
     navigator.geolocation.getCurrentPosition(getWeatherForLocation, null, options);
 }
 
 
 function getWeatherForLocation(location) {
-    var location_request = new XMLHttpRequest();
-    location_request.open('GET', 'http://where.yahooapis.com/geocode?location=' + location.coords.latitude + ','  + location.coords.longitude + '&gflags=R&appid=zHgnBS4m');
-    location_request.onload = function() {
-
-        var woeId = this.responseXML.getElementsByTagName("woeid")[0].childNodes[0].nodeValue;
-
-        var weather_request = new XMLHttpRequest();
-        weather_request.open('GET', 'http://weather.yahooapis.com/forecastrss?u=' + localStorage['degrees'] + '&w=' + woeId);
-        weather_request.onload = showWeather;
-        weather_request.send()
+    var locationRequest = new XMLHttpRequest();
+    var latituteAndLongitude = location.coords.latitude + ","  + location.coords.longitude;
+    var woeId = localStorage["location-coordinates" + latituteAndLongitude];
+    if (woeId) {
+        getWeatherForWoeID(woeId);
+        return;
     }
-    location_request.send()
+
+    locationRequest.open("GET", "http://where.yahooapis.com/geocode?location=" + latituteAndLongitude + "&gflags=R&appid=zHgnBS4m");
+    locationRequest.onload = function() {
+        var woeId = this.responseXML.getElementsByTagName("woeid")[0].childNodes[0].nodeValue;
+        localStorage["location-coordinates" + latituteAndLongitude] = woeId;
+        getWeatherForWoeID(woeId);
+    }
+    locationRequest.send()
 }
 
+
+function getWeatherForWoeID(woeId) {
+    var weatherRequest = new XMLHttpRequest();
+    weatherRequest.open("GET", "http://weather.yahooapis.com/forecastrss?u=" + localStorage["degrees"] + "&w=" + woeId);
+    weatherRequest.onload = showWeather;
+    weatherRequest.onerror = function () {
+        // try to reload the weather again in 10 seconds
+        timeout = window.setTimeout(getWeather, 10000);
+    }
+    weatherRequest.send();
+}
 
 function showWeather() {
     var channelNode = this.responseXML.getElementsByTagName("channel")[0];
 
     // get link and ttl
-    new_weather_link = channelNode.getElementsByTagName("link")[0].childNodes[0].nodeValue;
-    if ("" != new_weather_link) {
-        weather_link = new_weather_link
+    var newWeatherLink = channelNode.getElementsByTagName("link")[0].childNodes[0].nodeValue;
+    if ("" != newWeatherLink) {
+        weatherLink = newWeatherLink
     }
-    ttl = channelNode.getElementsByTagName("ttl")[0].childNodes[0].nodeValue;
+    var ttl = channelNode.getElementsByTagName("ttl")[0].childNodes[0].nodeValue;
 
     // get temperature and code
     var itemNode = channelNode.getElementsByTagName("item")[0];
@@ -43,17 +57,17 @@ function showWeather() {
 
     // update temperature if necessary
     if (temperature != newTemperature) {
-        chrome.browserAction.setBadgeText({text: newTemperature + "\u00B0" + localStorage['degrees'].toUpperCase()});
+        chrome.browserAction.setBadgeText({text: newTemperature + "\u00B0" + localStorage["degrees"].toUpperCase()});
         temperature = newTemperature;
     }
 
     // update image if necessary
     if (code != newCode) {
-        var image = document.getElementById('image');
-        var canvas = document.getElementById('canvas');
+        var image = document.getElementById("image");
+        var canvas = document.getElementById("canvas");
 
         image.onload = function() {
-            var context = canvas.getContext('2d');
+            var context = canvas.getContext("2d");
 //            context.fillStyle = "white";
 //            context.fillRect(0,0,canvas.width, canvas.height);
 //            context.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -64,9 +78,9 @@ function showWeather() {
             chrome.browserAction.setIcon({imageData: imageData});
         };
         code = newCode;
-//        image.src = 'http://l.yimg.com/a/i/us/we/52/' + code + '.gif';
+//        image.src = "http://l.yimg.com/a/i/us/we/52/" + code + ".gif";
 
-        image.src = 'http://l.yimg.com/a/i/us/nws/weather/gr/' + code + 'd.png';
+        image.src = "http://l.yimg.com/a/i/us/nws/weather/gr/" + code + "d.png";
     }
 
     // reload weather after cache is expired
@@ -75,9 +89,9 @@ function showWeather() {
 
 
 function updateDefaults() {
-  var degrees = localStorage['degrees'];
-  if (!degrees || degrees != 'f' || degrees != 'c') {
-    localStorage['degrees'] = 'f';
+  var degrees = localStorage["degrees"];
+  if (!degrees || degrees != "f" || degrees != "c") {
+    localStorage["degrees"] = "f";
   }
 }
 
@@ -89,14 +103,14 @@ function onInit() {
 
 
 function onClick() {
-    chrome.tabs.create({'url': weather_link}, null)
+    chrome.tabs.create({"url": weatherLink}, null)
 }
 
 
 function onMessage(request, sender, sendResponse) {
     if (request.action == "reloadWeather") {
         clearTimeout(timeout);
-        temperature = '';
+        temperature = "";
         getWeather();
     }
 }

@@ -1,24 +1,20 @@
-function restore_options() {
+function restoreOptions() {
   // Restore degrees
 
     var degrees = localStorage["degrees"];
-    if (!degrees) {
-        alert('no default degrees');
-        return;
+    if (degrees) {
+        document.getElementById("degrees_" + degrees).checked = "checked";
     }
-
-    document.getElementById("degrees_" + degrees).checked = "checked";
 }
 
 
-function set_degrees(sender) {
+function setDegrees(sender) {
     localStorage["degrees"] = sender.target.value;
-
     chrome.extension.sendMessage({action: "reloadWeather"});
 }
 
 
-restore_options();
+restoreOptions();
 
-document.getElementById('degrees_c').addEventListener('click', set_degrees);
-document.getElementById('degrees_f').addEventListener('click', set_degrees);
+document.getElementById("degrees_c").addEventListener("click", setDegrees);
+document.getElementById("degrees_f").addEventListener("click", setDegrees);
