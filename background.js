@@ -4,8 +4,8 @@ var code;
 var timeout;
 
 function getWeather() {
-    var options = {"enableHighAccuracy": true, "timeout": 10000, "maximumAge": 0}
-    navigator.geolocation.getCurrentPosition(getWeatherForLocation, null, options);
+    var options = {"enableHighAccuracy": true, "timeout": 60000, "maximumAge": 0}
+    navigator.geolocation.getCurrentPosition(getWeatherForLocation, getWeather, options);
 }
 
 
@@ -20,7 +20,13 @@ function getWeatherForLocation(location) {
 
     locationRequest.open("GET", "http://where.yahooapis.com/geocode?location=" + latituteAndLongitude + "&gflags=R&appid=zHgnBS4m");
     locationRequest.onload = function() {
-        var woeId = this.responseXML.getElementsByTagName("woeid")[0].childNodes[0].nodeValue;
+        var woeIdNode = this.responseXML.getElementsByTagName("woeid")[0].childNodes[0];
+        if (!woeIdNode) {
+            // try to reload the weather again in 10 seconds
+            timeout = window.setTimeout(getWeather, 10000);
+            return;
+        }
+        var woeId = woeIdNode.nodeValue;
         localStorage["location-coordinates" + latituteAndLongitude] = woeId;
         getWeatherForWoeID(woeId);
     }
