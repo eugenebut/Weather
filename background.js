@@ -36,7 +36,7 @@ function getWeatherForLocation(location) {
 
 function getWeatherForWoeID(woeId) {
     var weatherRequest = new XMLHttpRequest();
-    weatherRequest.open("GET", "http://weather.yahooapis.com/forecastrss?u=" + localStorage["degrees"] + "&w=" + woeId);
+    weatherRequest.open("GET", "http://weather.yahooapis.com/forecastrss?u=" + getDegrees() + "&w=" + woeId);
     weatherRequest.onload = showWeather;
     weatherRequest.onerror = function () {
         // try to reload the weather again in 10 seconds
@@ -63,7 +63,7 @@ function showWeather() {
 
     // update temperature if necessary
     if (temperature != newTemperature) {
-        chrome.browserAction.setBadgeText({text: newTemperature + "\u00B0" + localStorage["degrees"].toUpperCase()});
+        chrome.browserAction.setBadgeText({text: newTemperature + "\u00B0" + getDegrees().toUpperCase()});
         temperature = newTemperature;
     }
 
@@ -94,16 +94,7 @@ function showWeather() {
 }
 
 
-function updateDefaults() {
-  var degrees = localStorage["degrees"];
-  if (!degrees || degrees != "f" || degrees != "c") {
-    localStorage["degrees"] = "f";
-  }
-}
-
-
 function onInit() {
-    updateDefaults();
     getWeather();
 }
 
