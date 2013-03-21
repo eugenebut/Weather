@@ -63,8 +63,8 @@ YahooWeatherRequest.prototype._onLoadWeather = function(request) {
     var image = new Image();
     image.onload = function() {
         var canvas = document.createElement('canvas');
-        canvas.height = "19";
-        canvas.width = "19";
+        canvas.height = 19;
+        canvas.width = 19;
         var context = canvas.getContext("2d");
         context.drawImage(image, 0, 0, 27, 19);
         var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
