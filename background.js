@@ -11,7 +11,6 @@ function WeatherUpdater() {
 
 WeatherUpdater.prototype.reload = function() {
     window.clearTimeout(this._timeout);
-
     var options = {enableHighAccuracy: false, timeout: 60000, maximumAge: 60000}
     navigator.geolocation.getCurrentPosition(this._onLoadLocation.bind(this), this.reload.bind(this), options);
 };
@@ -21,14 +20,13 @@ WeatherUpdater.prototype._onLoadLocation = function(location) {
     var reloadCallback = function(timeout) {
         this._timeout = window.setTimeout(this.reload.bind(this), timeout);
     }
-    var reloadAfterTimeout = reloadCallback.bind(this)
-
+    var updater = this;
     var weatherRequest = new YahooWeatherRequest();
     weatherRequest.onload = function(temperature, icon, link, ttl) {
         chrome.browserAction.setBadgeText({text: temperature + "\u00B0" + getDegrees().toUpperCase()});
         chrome.browserAction.setIcon({imageData: icon});
-        this.weatherLink = link || this.weatherLink;
-        reloadAfterTimeout(parseInt(ttl) * 1000);
+        updater.weatherLink = link || updater.weatherLink;
+        reloadCallback.bind(updater, parseInt(ttl) * 1000);
     }
     weatherRequest.onerror = reloadCallback.bind(this, 10000);
     weatherRequest.send(location, getDegrees());
