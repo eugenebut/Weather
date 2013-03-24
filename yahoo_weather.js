@@ -20,6 +20,7 @@ YahooWeatherRequest.prototype.send = function(location, degrees) {
     locationRequest.onload = this._onLoadLocation.bind(this, locationRequest, storageKey);
     locationRequest.onerror = this.onerror;
     locationRequest.send();
+    console.log("Did locationRequest");
 };
 
 
@@ -29,6 +30,7 @@ YahooWeatherRequest.prototype._requestWeatherForWoeID = function(woeId) {
     weatherRequest.onload = this._onLoadWeather.bind(this, weatherRequest);
     weatherRequest.onerror = this.onerror;
     weatherRequest.send();
+    console.log("Did weatherRequest");
 };
 
 
@@ -72,4 +74,5 @@ YahooWeatherRequest.prototype._onLoadWeather = function(request) {
     }
     image.onerror = this.onerror;
     image.src = "http://l.yimg.com/a/i/us/nws/weather/gr/" + code + "d.png";
+    console.log("Did image.src");
 }
