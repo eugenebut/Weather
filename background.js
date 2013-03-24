@@ -36,7 +36,7 @@ WeatherUpdater.prototype._onLoadLocation = function(location) {
         updater._reloadAfterTimeout(10000);
     }
     weatherRequest.onerror = this._reloadAfterTimeout.bind(this, 10000);
-    weatherRequest.send(location, getDegrees());
+    weatherRequest.send(getDegrees(), location);
     console.log("Did weatherRequest");
 }
 

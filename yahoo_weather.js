@@ -4,29 +4,29 @@ function YahooWeatherRequest() {
 }
 
 
-YahooWeatherRequest.prototype.send = function(location, degrees) {
+YahooWeatherRequest.prototype.send = function(degrees, location) {
     // lets check if we cached location woeID
     var latituteAndLongitude = location.coords.latitude + ","  + location.coords.longitude;
     var storageKey = "location-coordinates" + latituteAndLongitude;
     var woeID = localStorage[storageKey];
     if (woeID) {
-        this._requestWeatherForWoeID(woeID);
+        this._requestWeatherForWoeID(degrees, woeID);
         return;
     }
 
     // lets find out location woid
     var locationRequest = new XMLHttpRequest();
     locationRequest.open("GET", "http://where.yahooapis.com/geocode?location=" + latituteAndLongitude + "&gflags=R&appid=zHgnBS4m");
-    locationRequest.onload = this._onLoadLocation.bind(this, locationRequest, storageKey);
+    locationRequest.onload = this._onLoadLocation.bind(this, locationRequest, degrees, storageKey);
     locationRequest.onerror = this.onerror;
     locationRequest.send();
     console.log("Did locationRequest");
 };
 
 
-YahooWeatherRequest.prototype._requestWeatherForWoeID = function(woeId) {
+YahooWeatherRequest.prototype._requestWeatherForWoeID = function(degrees, woeId) {
     var weatherRequest = new XMLHttpRequest();
-    weatherRequest.open("GET", "http://weather.yahooapis.com/forecastrss?u=" + getDegrees() + "&w=" + woeId);
+    weatherRequest.open("GET", "http://weather.yahooapis.com/forecastrss?u=" + degrees + "&w=" + woeId);
     weatherRequest.onload = this._onLoadWeather.bind(this, weatherRequest);
     weatherRequest.onerror = this.onerror;
     weatherRequest.send();
@@ -34,7 +34,7 @@ YahooWeatherRequest.prototype._requestWeatherForWoeID = function(woeId) {
 };
 
 
-YahooWeatherRequest.prototype._onLoadLocation = function(request, storageKey) {
+YahooWeatherRequest.prototype._onLoadLocation = function(request, degrees, storageKey) {
     var woeIdNode = request.responseXML.getElementsByTagName("woeid")[0].childNodes[0];
     if (!woeIdNode) {
         this.onerror();
@@ -43,7 +43,7 @@ YahooWeatherRequest.prototype._onLoadLocation = function(request, storageKey) {
 
     var woeId = woeIdNode.nodeValue;
     localStorage[storageKey] = woeId;
-    this._requestWeatherForWoeID(woeId);
+    this._requestWeatherForWoeID(degrees, woeId);
 }
 
 
