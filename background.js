@@ -20,7 +20,7 @@ WeatherUpdater.prototype.reload = function() {
 
 
 WeatherUpdater.prototype._reloadAfterTimeout = function(timeout) {
-    console.log("Reload scheduled");
+    console.log("Reload scheduled in: " + timeout);
     this._timeout = window.setTimeout(this.reload.bind(this), timeout);
 }
 
@@ -33,7 +33,7 @@ WeatherUpdater.prototype._onLoadLocation = function(location) {
         if (link) {
             updater.weatherLink = link;
         }
-        updater._reloadAfterTimeout(10000);
+        updater._reloadAfterTimeout(ttl * 1000);
     }
     weatherRequest.onerror = this._reloadAfterTimeout.bind(this, 10000);
     weatherRequest.send(getDegrees(), location);
