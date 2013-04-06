@@ -5,8 +5,11 @@ function YahooWeatherRequest() {
 
 
 YahooWeatherRequest.prototype.send = function(degrees, location) {
+    // we don't need extremely high precision here
+    var latitude = Math.round(location.coords.latitude * 1000) / 1000;
+    var longitude = Math.round(location.coords.longitude * 1000) / 1000;
+    var latituteAndLongitude = latitude + ","  + longitude;
     // lets check if we cached location woeID
-    var latituteAndLongitude = location.coords.latitude + ","  + location.coords.longitude;
     var storageKey = "location-coordinates" + latituteAndLongitude;
     var woeID = localStorage[storageKey];
     if (woeID) {
