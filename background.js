@@ -1,11 +1,9 @@
 function onInit() {
     var updater = new WeatherUpdater();
-    updater.onupdate = function(temperature, icon, link, ttl) {
+    updater.degrees = getDegrees();
+    updater.onupdate = function(temperature, icon) {
         chrome.browserAction.setBadgeText({text: temperature + "\u00B0" + getDegrees().toUpperCase()});
         chrome.browserAction.setIcon({imageData: icon});
-        if (link) {
-            updater.weatherLink = link;
-        }
     }
     updater.reload();
 }
@@ -18,6 +16,7 @@ function onClick() {
 
 function onMessage(request, sender, sendResponse) {
     if (request.action == "reloadWeather") {
+        WeatherUpdater().degrees = getDegrees();
         WeatherUpdater().reload();
     }
 }

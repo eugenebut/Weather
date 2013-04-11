@@ -5,17 +5,19 @@ function WeatherUpdater() {
     arguments.callee._singletonInstance = this;
 
     this.onupdate = function() {};
+    this.degrees = 'f';
     this.weatherLink = null;
+    this.retryTimeout = 10000;
+
     this._timeout = null;
-    this._retryTimeout = 10000;
 }
 
 
 WeatherUpdater.prototype.reload = function() {
     window.clearTimeout(this._timeout);
-    var options = {enableHighAccuracy: false, timeout: this._retryTimeout, maximumAge: 60000}
+    var options = {enableHighAccuracy: false, timeout: this.retryTimeout, maximumAge: 60000}
     navigator.geolocation.getCurrentPosition(this._onLoadLocation.bind(this),
-        this._reloadAfterTimeout.bind(this, this._retryTimeout),
+        this._reloadAfterTimeout.bind(this, this.retryTimeout),
         options);
     console.log("Did getCurrentPosition");
 };
@@ -31,10 +33,11 @@ WeatherUpdater.prototype._onLoadLocation = function(location) {
     var updater = this;
     var weatherRequest = new YahooWeatherRequest();
     weatherRequest.onload = function(temperature, icon, link, ttl) {
-        updater.onupdate(temperature, icon, link, ttl);
+        this.weatherLink = link;
+        updater.onupdate(temperature, icon);
         updater._reloadAfterTimeout(ttl * 1000);
     }
-    weatherRequest.onerror = this._reloadAfterTimeout.bind(this, this._retryTimeout);
-    weatherRequest.send(getDegrees(), location);
+    weatherRequest.onerror = this._reloadAfterTimeout.bind(this, this.retryTimeout);
+    weatherRequest.send(this.degrees, location);
     console.log("Did weatherRequest");
 }
