@@ -5,12 +5,27 @@ function WeatherUpdater() {
     arguments.callee._singletonInstance = this;
 
     this.onupdate = function() {};
-    this.degrees = 'f';
-    this.weatherLink = null;
     this.retryTimeout = 10000;
 
+    this._degrees = 'f';
+    this._weatherLink = null;
     this._timeout = null;
 }
+
+
+WeatherUpdater.prototype = {
+    get degrees() {
+        return this._degrees;
+    },
+    set degrees(newDegrees) {
+        if ('f' == newDegrees || 'c' == newDegrees) {
+            this._degrees = newDegrees;
+        }
+    },
+    get weatherLink() {
+        return this._weatherLink;
+    }
+};
 
 
 WeatherUpdater.prototype.reload = function() {
@@ -33,7 +48,7 @@ WeatherUpdater.prototype._onLoadLocation = function(location) {
     var updater = this;
     var weatherRequest = new YahooWeatherRequest();
     weatherRequest.onload = function(temperature, icon, link, ttl) {
-        this.weatherLink = link;
+        updater._weatherLink = link;
         updater.onupdate(temperature, icon);
         updater._reloadAfterTimeout(ttl * 1000);
     }
