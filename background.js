@@ -2,8 +2,15 @@ function onInit() {
     var updater = new WeatherUpdater();
     updater.degrees = getDegrees();
     updater.onupdate = function(temperature, icon) {
+        console.log("background onupdate");
         chrome.browserAction.setBadgeText({text: temperature + "\u00B0" + getDegrees().toUpperCase()});
         chrome.browserAction.setIcon({imageData: icon});
+    }
+
+    updater.onerror = function(temperature, icon) {
+        console.log("background onerror");
+        chrome.browserAction.setIcon({path: "loading_small.gif"});
+        chrome.browserAction.setBadgeText({'text': ''});
     }
     updater.reload();
 }

@@ -5,6 +5,7 @@ function WeatherUpdater() {
     arguments.callee._singletonInstance = this;
 
     this.onupdate = function() {};
+    this.onerror = function() {};
     this.retryTimeout = 10000;
 
     this._degrees = 'f';
@@ -30,11 +31,19 @@ WeatherUpdater.prototype = {
 
 WeatherUpdater.prototype.reload = function() {
     window.clearTimeout(this._timeout);
-    var options = {enableHighAccuracy: false, timeout: this.retryTimeout, maximumAge: 60000}
-    navigator.geolocation.getCurrentPosition(this._onLoadLocation.bind(this),
-        this._reloadAfterTimeout.bind(this, this.retryTimeout),
-        options);
-    console.log("Did getCurrentPosition");
+    var options = {enableHighAccuracy: false, timeout: this.retryTimeout, maximumAge: 60000};
+    var updater = this;
+    navigator.geolocation.getCurrentPosition(
+        function (location) {
+            updater._onLoadLocation(location);
+        },
+        function() {
+            updater.onerror();
+            updater._reloadAfterTimeout(updater.retryTimeout);
+        },
+        options
+    );
+    console.log("reload");
 };
 
 
@@ -52,7 +61,12 @@ WeatherUpdater.prototype._onLoadLocation = function(location) {
         updater.onupdate(temperature, icon);
         updater._reloadAfterTimeout(ttl * 1000);
     }
-    weatherRequest.onerror = this._reloadAfterTimeout.bind(this, this.retryTimeout);
+    weatherRequest.onerror = function() {
+        console.log("Error from weather request");
+        updater._reloadAfterTimeout(updater, updater.retryTimeout);
+        updater.onerror();
+    }
+
     weatherRequest.send(this.degrees, location);
     console.log("Did weatherRequest");
 }
