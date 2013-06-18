@@ -55,7 +55,8 @@ WeatherUpdater.prototype._reloadAfterTimeout = function(timeout) {
 
 WeatherUpdater.prototype._onLoadLocation = function(location) {
     var updater = this;
-    var weatherRequest = new YahooWeatherRequest();
+    var appId = "7LIl5JvV34E1wo7ujvlh6ivuccahBqwykIMfQqn9j6abo535A64Hc7Zvqb3qZ7gxA5jhiFSCnEZQz04KBPnxYvY9kBAnDUs";
+    var weatherRequest = new YahooWeatherRequest(appId);
     weatherRequest.onload = function(temperature, icon, link, ttl) {
         updater._weatherLink = link;
         updater.onupdate(temperature, icon);
