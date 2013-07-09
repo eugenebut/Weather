@@ -23,6 +23,7 @@ YahooWeatherRequest.prototype.send = function(degrees, location) {
     locationRequest.open("GET", "http://where.yahooapis.com/geocode?location=" + latituteAndLongitude + "&gflags=R&appid=" + this.appId);
     locationRequest.onload = this._onLoadLocation.bind(this, locationRequest, degrees, storageKey);
     locationRequest.onerror = this.onerror.bind(this);
+    locationRequest.ontimeout = this.onerror.bind(this);
     locationRequest.send();
     console.log("Did locationRequest");
 };
@@ -33,12 +34,17 @@ YahooWeatherRequest.prototype._requestWeatherForWoeID = function(degrees, woeId)
     weatherRequest.open("GET", "http://weather.yahooapis.com/forecastrss?u=" + degrees + "&w=" + woeId);
     weatherRequest.onload = this._onLoadWeather.bind(this, weatherRequest);
     weatherRequest.onerror = this.onerror.bind(this);
+    weatherRequest.ontimeout = this.onerror.bind(this);
     weatherRequest.send();
     console.log("Did weatherRequest");
 };
 
 
 YahooWeatherRequest.prototype._onLoadLocation = function(request, degrees, storageKey) {
+    if (request.status != 200) {
+        this.onerror();
+        return;
+    }
     var woeIdNode = request.responseXML.getElementsByTagName("woeid")[0].childNodes[0];
     if (!woeIdNode) {
         this.onerror();
@@ -52,6 +58,11 @@ YahooWeatherRequest.prototype._onLoadLocation = function(request, degrees, stora
 
 
 YahooWeatherRequest.prototype._onLoadWeather = function(request) {
+    if (request.status != 200) {
+        this.onerror();
+        return;
+    }
+
     var channelNode = request.responseXML.getElementsByTagName("channel")[0];
 
     // get link and ttl
