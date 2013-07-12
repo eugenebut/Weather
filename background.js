@@ -9,7 +9,7 @@ function onInit() {
 
     updater.onerror = function(temperature, icon) {
         console.log("background onerror");
-        chrome.browserAction.setIcon({path: "loading_small.gif"});
+        chrome.browserAction.setIcon({path: "loading.png"});
         chrome.browserAction.setBadgeText({'text': ''});
     }
     updater.reload();
