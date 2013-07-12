@@ -6,7 +6,7 @@
   "browser_action": {
     "default_icon": "img/loading.png"
   },
-  "options_page": "options.html",
+  "options_page": "html/options.html",
   "permissions": [
     "http://weather.yahooapis.com/",
     "http://l.yimg.com/",
@@ -14,6 +14,6 @@
   ],
   "background": {
     "persistent": true,
-    "page": "background.html"
+    "page": "html/background.html"
   }
 }
