@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "description": "Shows weather in current location. Powered by Yahoo! Weather.",
   "browser_action": {
-    "default_icon": "loading.png"
+    "default_icon": "img/loading.png"
   },
   "options_page": "options.html",
   "permissions": [
