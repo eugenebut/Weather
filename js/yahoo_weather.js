@@ -69,11 +69,14 @@ YahooWeatherRequest.prototype._onLoadWeather = function(request) {
     var link = channelNode.getElementsByTagName("link")[0].childNodes[0].nodeValue;
     var ttl = channelNode.getElementsByTagName("ttl")[0].childNodes[0].nodeValue;
 
-    // get temperature and code
+    // get temperature, code and location
     var itemNode = channelNode.getElementsByTagName("item")[0];
     var conditionNode = itemNode.getElementsByTagNameNS("*", "condition")[0];
     var temperature = conditionNode.attributes.getNamedItem("temp").nodeValue;
     var code = conditionNode.attributes.getNamedItem("code").nodeValue;
+    var locationNode = channelNode.getElementsByTagNameNS("*", "location")[0];
+    var location = locationNode.attributes.getNamedItem("city").nodeValue;
+
 
     // create image
     var reportWeatherCallback = this.onload.bind(this);
@@ -85,7 +88,7 @@ YahooWeatherRequest.prototype._onLoadWeather = function(request) {
         var context = canvas.getContext("2d");
         context.drawImage(image, 0, 0, 27, 19);
         var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        reportWeatherCallback(temperature, imageData, link, ttl);
+        reportWeatherCallback(temperature, imageData, link, location, ttl);
     }
     image.onerror = this.onerror.bind();
     image.src = "http://l.yimg.com/a/i/us/nws/weather/gr/" + code + "d.png";

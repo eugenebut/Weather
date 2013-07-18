@@ -1,16 +1,19 @@
 function onInit() {
     var updater = new WeatherUpdater();
     updater.degrees = getDegrees();
-    updater.onupdate = function(temperature, icon) {
+    updater.onupdate = function(temperature, icon, location) {
         console.log("background onupdate");
         chrome.browserAction.setBadgeText({text: temperature + "\u00B0" + getDegrees().toUpperCase()});
         chrome.browserAction.setIcon({imageData: icon});
+        chrome.browserAction.setTitle({title: location});
     }
 
-    updater.onerror = function(temperature, icon) {
+    updater.onerror = function() {
         console.log("background onerror");
         chrome.browserAction.setIcon({path: "../img/loading.png"});
-        chrome.browserAction.setBadgeText({'text': ''});
+        chrome.browserAction.setBadgeText({'text': ""});
+        chrome.browserAction.setTitle({title: ""});
+
     }
     updater.reload();
 }

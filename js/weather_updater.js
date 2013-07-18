@@ -57,9 +57,9 @@ WeatherUpdater.prototype._onLoadLocation = function(location) {
     var updater = this;
     var appId = "7LIl5JvV34E1wo7ujvlh6ivuccahBqwykIMfQqn9j6abo535A64Hc7Zvqb3qZ7gxA5jhiFSCnEZQz04KBPnxYvY9kBAnDUs";
     var weatherRequest = new YahooWeatherRequest(appId);
-    weatherRequest.onload = function(temperature, icon, link, ttl) {
+    weatherRequest.onload = function(temperature, icon, link, location, ttl) {
         updater._weatherLink = link;
-        updater.onupdate(temperature, icon);
+        updater.onupdate(temperature, icon, location);
         updater._reloadAfterTimeout(ttl * 1000);
     }
     weatherRequest.onerror = function() {
